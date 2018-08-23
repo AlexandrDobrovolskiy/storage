@@ -56,5 +56,9 @@ func main() {
 		TLSNextProto: make(map[string]func(*http.Server, *tls.Conn, http.Handler), 0),
 	}
 
-	log.Fatal(Server.ListenAndServeTLS(config.Config.Server.SecureCert, config.Config.Server.SecureKey))
+	if config.Config.Server.SecureConn {
+		log.Fatal(Server.ListenAndServeTLS(config.Config.Server.SecureCert, config.Config.Server.SecureKey))
+	} else {
+		log.Fatal(Server.ListenAndServe())
+	}
 }
