@@ -11,11 +11,14 @@ import (
 
 	"FITstorage/config"
 	"FITstorage/controllers"
+	"runtime"
 )
 
 var Server *http.Server
 
 func main() {
+
+	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	envName := *flag.String("c", "server.cfg", "Environment config name")
 

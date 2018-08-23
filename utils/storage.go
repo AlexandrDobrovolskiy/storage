@@ -5,22 +5,14 @@ import (
 	"io"
 	"mime/multipart"
 	"os"
-	"strings"
-
-	"github.com/google/uuid"
 )
 
-func StoreFile(path string, file *multipart.FileHeader) (string, error) {
-
-	parseName := strings.Split(file.Filename, ".")
-	ext := parseName[len(parseName)-1]
-
-	name := uuid.New().String() + "." + ext
+func StoreFile(path string, name string, file *multipart.FileHeader) error {
 
 	f, err := os.Create(path + name)
 
 	if err != nil {
-		return "", errors.New("failed to create file")
+		return errors.New("failed to create file")
 	}
 
 	defer f.Close()
@@ -28,7 +20,7 @@ func StoreFile(path string, file *multipart.FileHeader) (string, error) {
 	image, err := file.Open()
 
 	if err != nil {
-		return "", errors.New("failed to read file")
+		return errors.New("failed to read file")
 	}
 
 	defer image.Close()
@@ -36,8 +28,8 @@ func StoreFile(path string, file *multipart.FileHeader) (string, error) {
 	_, err = io.Copy(f, image)
 
 	if err != nil {
-		return "", errors.New("failed to copy file")
+		return errors.New("failed to copy file")
 	}
 
-	return name, nil
+	return nil
 }
