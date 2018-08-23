@@ -1,12 +1,13 @@
 package controllers
 
 import (
-	"net/http"
-	u "storage/utils"
 	"fmt"
-	"storage/models"
+	"net/http"
 	"sync"
-	c "storage/constants"
+
+	c "FITstorage/constants"
+	"FITstorage/models"
+	u "FITstorage/utils"
 )
 
 const FilesNewsPath = "public/files/news/"
@@ -17,7 +18,7 @@ var UploadFile = func(w http.ResponseWriter, r *http.Request) {
 
 	var fResp []models.File
 
-	for key, files := range r.MultipartForm.File{
+	for key, files := range r.MultipartForm.File {
 		wg := sync.WaitGroup{}
 
 		if key == "news" {
@@ -29,7 +30,7 @@ var UploadFile = func(w http.ResponseWriter, r *http.Request) {
 
 					fResp = append(fResp, models.File{
 						Name: name,
-						Url: c.HostName + c.FilesNews + name,
+						Url:  c.HostName + c.FilesNews + name,
 					})
 
 					fmt.Println(files, index, name, n, err)

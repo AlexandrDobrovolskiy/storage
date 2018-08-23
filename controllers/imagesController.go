@@ -1,12 +1,13 @@
 package controllers
 
 import (
-	"net/http"
-	u "storage/utils"
 	"fmt"
-	"storage/models"
+	"net/http"
 	"sync"
-	c "storage/constants"
+
+	c "FITstorage/constants"
+	"FITstorage/models"
+	u "FITstorage/utils"
 )
 
 const ImageNewsPath = "public/images/news/"
@@ -17,7 +18,7 @@ var UploadImage = func(w http.ResponseWriter, r *http.Request) {
 
 	var images []models.Image
 
-	for key, files := range r.MultipartForm.File{
+	for key, files := range r.MultipartForm.File {
 		wg := sync.WaitGroup{}
 
 		if key == "news" {
@@ -29,7 +30,7 @@ var UploadImage = func(w http.ResponseWriter, r *http.Request) {
 
 					images = append(images, models.Image{
 						Name: name,
-						Url: c.HostName + c.ImagesNews + name,
+						Url:  c.HostName + c.ImagesNews + name,
 					})
 
 					fmt.Println(images, index, name, n, err)

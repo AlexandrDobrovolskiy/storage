@@ -1,18 +1,19 @@
 package utils
 
 import (
-	"os"
+	"errors"
 	"io"
 	"mime/multipart"
-	"errors"
-	"github.com/chilts/sid"
+	"os"
 	"strings"
+
+	"github.com/chilts/sid"
 )
 
 func StoreFile(path string, file *multipart.FileHeader) (string, int64, error) {
 
 	parseName := strings.Split(file.Filename, ".")
-	ext := parseName[len(parseName) - 1]
+	ext := parseName[len(parseName)-1]
 
 	name := sid.Id() + "." + ext
 
@@ -32,4 +33,3 @@ func StoreFile(path string, file *multipart.FileHeader) (string, int64, error) {
 
 	return name, n, nil
 }
-

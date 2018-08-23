@@ -2,13 +2,15 @@ package main
 
 import (
 	"crypto/tls"
-	"github.com/gorilla/mux"
-		"fmt"
-	"net/http"
-	"storage/controllers"
-	"log"
 	"flag"
-	"storage/config"
+	"fmt"
+	"log"
+	"net/http"
+
+	"github.com/gorilla/mux"
+
+	"FITstorage/config"
+	"FITstorage/controllers"
 )
 
 var Server *http.Server
@@ -33,7 +35,6 @@ func main() {
 
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(dir)))).Methods("GET")
 
-
 	fmt.Println("Listening on ", config.Config.Server.Port)
 
 	cfg := &tls.Config{
@@ -57,4 +58,3 @@ func main() {
 
 	log.Fatal(Server.ListenAndServeTLS(config.Config.Server.SecureCert, config.Config.Server.SecureKey))
 }
-
