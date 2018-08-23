@@ -38,7 +38,7 @@ func UploadImage(w http.ResponseWriter, r *http.Request) {
 				name := uuid.New().String() + "." + ext
 				imagesList = append(imagesList, models.Image{
 					Name: name,
-					Url:  c.HostName + c.FilesNews + name,
+					Url:  c.HostName + c.ImagesNews + name,
 				})
 				go u.StoreFile(ImageNewsPath, name, file)
 			}
