@@ -29,7 +29,7 @@ var UploadFile = func(w http.ResponseWriter, r *http.Request) {
 
 					fResp = append(fResp, models.File{
 						Name: name,
-						Url: c.HostName + c.ImagesNews + name,
+						Url: c.HostName + c.FilesNews + name,
 					})
 
 					fmt.Println(files, index, name, n, err)

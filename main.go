@@ -3,21 +3,23 @@ package main
 import (
 	"crypto/tls"
 	"github.com/gorilla/mux"
-	"os"
-	"fmt"
+		"fmt"
 	"net/http"
 	"storage/controllers"
 	"log"
 	"flag"
+	"storage/config"
 )
 
 var Server *http.Server
 
 func main() {
 
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "5000"
+	envName := *flag.String("c", "server.cfg", "Environment config name")
+
+	err := config.LoadConfig(envName)
+	if err != nil {
+		fmt.Println(err)
 	}
 
 	router := mux.NewRouter()
@@ -26,13 +28,13 @@ func main() {
 	router.HandleFunc("/files/news", controllers.UploadFile).Methods("POST")
 
 	var dir string
-	flag.StringVar(&dir, "dir", "public/", "../public/")
+	flag.StringVar(&dir, "dir", "public/", "public")
 	flag.Parse()
 
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(dir)))).Methods("GET")
 
 
-	fmt.Println("Listening on ", port)
+	fmt.Println("Listening on ", config.Config.Server.Port)
 
 	cfg := &tls.Config{
 		MinVersion:               tls.VersionTLS12,
@@ -47,12 +49,12 @@ func main() {
 	}
 
 	Server = &http.Server{
-		Addr:         ":" + port,
+		Addr:         config.Config.Server.Port,
 		Handler:      router,
 		TLSConfig:    cfg,
 		TLSNextProto: make(map[string]func(*http.Server, *tls.Conn, http.Handler), 0),
 	}
 
-	log.Fatal(Server.ListenAndServeTLS(os.Getenv("CERT"), os.Getenv("KEY")))
+	log.Fatal(Server.ListenAndServeTLS(config.Config.Server.SecureCert, config.Config.Server.SecureKey))
 }
 
