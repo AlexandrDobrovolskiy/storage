@@ -25,7 +25,7 @@ type ServerConfig struct {
 }
 
 type EnvironmentConfig struct {
-	Server   ServerConfig   `yaml:"server"`
+	Server ServerConfig `yaml:"server"`
 }
 
 func LoadConfig(name string) error {

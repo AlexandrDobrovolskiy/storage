@@ -1,35 +1,43 @@
 package utils
 
 import (
-	"os"
+	"errors"
 	"io"
 	"mime/multipart"
-	"errors"
-	"github.com/chilts/sid"
+	"os"
 	"strings"
+
+	"github.com/google/uuid"
 )
 
-func StoreFile(path string, file *multipart.FileHeader) (string, int64, error) {
+func StoreFile(path string, file *multipart.FileHeader) (string, error) {
 
 	parseName := strings.Split(file.Filename, ".")
-	ext := parseName[len(parseName) - 1]
+	ext := parseName[len(parseName)-1]
 
-	name := sid.Id() + "." + ext
+	name := uuid.New().String() + "." + ext
 
 	f, err := os.Create(path + name)
 
 	if err != nil {
-		return "", 0, errors.New("ERROR WHILE CREATING NEW FILE")
+		return "", errors.New("failed to create file")
 	}
+
+	defer f.Close()
 
 	image, err := file.Open()
 
-	n, err := io.Copy(f, image)
-
 	if err != nil {
-		return "", 0, errors.New("ERROR WHILE SAVING IMAGE")
+		return "", errors.New("failed to read file")
 	}
 
-	return name, n, nil
-}
+	defer image.Close()
 
+	_, err = io.Copy(f, image)
+
+	if err != nil {
+		return "", errors.New("failed to copy file")
+	}
+
+	return name, nil
+}
