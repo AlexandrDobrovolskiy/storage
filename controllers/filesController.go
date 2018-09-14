@@ -13,9 +13,15 @@ import (
 
 const FilesNewsPath = "public/files/news/"
 
-var UploadFile = func(w http.ResponseWriter, r *http.Request) {
+func UploadFile(w http.ResponseWriter, r *http.Request) {
 
-	r.ParseMultipartForm(0)
+	err := r.ParseMultipartForm(0)
+
+	if err != nil {
+		resp := u.Message(false, "Failed to read data.")
+		u.Respond(w, resp)
+		return
+	}
 
 	for key, files := range r.MultipartForm.File {
 		var filesList = make([]models.File, 0)
@@ -31,20 +37,22 @@ var UploadFile = func(w http.ResponseWriter, r *http.Request) {
 				ext := parseName[len(parseName)-1]
 				name := uuid.New().String() + "." + ext
 				filesList = append(filesList, models.File{
-					Name: name,
-					Url:  c.HostName + c.FilesNews + name,
+					OldName: file.Filename,
+					Url:     c.HostName + c.FilesNews + name,
+					Name:    name,
+					Type:    ext,
 				})
 				go u.StoreFile(FilesNewsPath, name, file)
 			}
 		}
-
-		go r.MultipartForm.RemoveAll()
 
 		resp := u.Message(true, "Files uploaded successfully.")
 		resp["files"] = filesList
 		u.Respond(w, resp)
 		return
 	}
+
+	go r.MultipartForm.RemoveAll()
 
 	resp := u.Message(false, "Failed to read data.")
 	u.Respond(w, resp)
