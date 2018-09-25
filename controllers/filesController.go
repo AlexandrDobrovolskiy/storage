@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"net/http"
-	"strings"
+	"os"
 
 	"github.com/google/uuid"
 
@@ -33,16 +33,16 @@ func UploadFile(w http.ResponseWriter, r *http.Request) {
 			}
 
 			for _, file := range files {
-				parseName := strings.Split(file.Filename, ".")
-				ext := parseName[len(parseName)-1]
-				name := uuid.New().String() + "." + ext
+				dirName := uuid.New().String()
+
+				dir := FilesNewsPath + dirName
+
 				filesList = append(filesList, models.File{
-					OldName: file.Filename,
-					Url:     c.HostName + c.FilesNews + name,
-					Name:    name,
-					Type:    ext,
+					Url: c.HostName + c.FilesNews + dirName + "/" + file.Filename,
 				})
-				go u.StoreFile(FilesNewsPath, name, file)
+
+				os.Mkdir(dir, os.ModePerm)
+				go u.StoreFile(dir+"/", file.Filename, file)
 			}
 		}
 

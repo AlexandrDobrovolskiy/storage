@@ -29,8 +29,19 @@ func main() {
 
 	router := mux.NewRouter()
 
+	// Old upload
 	router.HandleFunc("/images/news", controllers.UploadImage).Methods("POST")
 	router.HandleFunc("/files/news", controllers.UploadFile).Methods("POST")
+
+	// FilePond processing
+	router.HandleFunc("/filepond", controllers.FilePondProcess).Methods("POST")
+	router.HandleFunc("/filepond", controllers.FilePondDelete).Methods("DELETE")
+
+	// FilePond options
+	router.HandleFunc("/filepond", controllers.Options).Methods("OPTIONS")
+
+	// FilePond submit
+	router.HandleFunc("/filepond/confirm", controllers.SubmitStore).Methods("POST")
 
 	var dir string
 	flag.StringVar(&dir, "dir", "public/", "public")
