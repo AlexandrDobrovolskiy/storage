@@ -1,8 +1,11 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
+	"net/url"
 	"os"
+	"strings"
 
 	"github.com/google/uuid"
 
@@ -13,6 +16,32 @@ import (
 
 const FilesNewsPath = "public/files/news/"
 
+func formatRequest(r *http.Request) string {
+	// Create return string
+	var request []string
+	// Add the request string
+	url := fmt.Sprintf("%v %v %v", r.Method, r.URL, r.Proto)
+	request = append(request, url)
+	// Add the host
+	request = append(request, fmt.Sprintf("Host: %v", r.Host))
+	// Loop through headers
+	for name, headers := range r.Header {
+		name = strings.ToLower(name)
+		for _, h := range headers {
+			request = append(request, fmt.Sprintf("%v: %v", name, h))
+		}
+	}
+
+	// If this is a POST, add post data
+	if r.Method == "POST" {
+		r.ParseForm()
+		request = append(request, "\n")
+		request = append(request, r.Form.Encode())
+	}
+	// Return the request as a string
+	return strings.Join(request, "\n")
+}
+
 func UploadFile(w http.ResponseWriter, r *http.Request) {
 
 	err := r.ParseMultipartForm(0)
@@ -22,6 +51,8 @@ func UploadFile(w http.ResponseWriter, r *http.Request) {
 		u.Respond(w, resp)
 		return
 	}
+
+	println(formatRequest(r))
 
 	for key, files := range r.MultipartForm.File {
 		var filesList = make([]models.File, 0)
@@ -37,12 +68,16 @@ func UploadFile(w http.ResponseWriter, r *http.Request) {
 
 				dir := FilesNewsPath + dirName
 
+				parsed, _ := url.Parse(file.Filename)
+
+				filename := parsed.Path
+
 				filesList = append(filesList, models.File{
-					Url: c.HostName + c.FilesNews + dirName + "/" + file.Filename,
+					Url: c.HostName + c.FilesNews + dirName + "/" + string(filename),
 				})
 
 				os.Mkdir(dir, os.ModePerm)
-				go u.StoreFile(dir+"/", file.Filename, file)
+				go u.StoreFile(dir+"/", string(filename), file)
 			}
 		}
 

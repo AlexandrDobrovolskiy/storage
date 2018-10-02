@@ -36,6 +36,7 @@ func main() {
 	// FilePond processing
 	router.HandleFunc("/filepond", controllers.FilePondProcess).Methods("POST")
 	router.HandleFunc("/filepond", controllers.FilePondDelete).Methods("DELETE")
+	router.HandleFunc("/filepond", controllers.FilePondLoad).Methods("GET")
 
 	// FilePond options
 	router.HandleFunc("/filepond", controllers.Options).Methods("OPTIONS")

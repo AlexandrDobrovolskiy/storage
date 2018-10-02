@@ -67,6 +67,27 @@ func FilePondDelete(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+func FilePondLoad(w http.ResponseWriter, r *http.Request) {
+	load, _ := r.URL.Query()["load"]
+
+	//use load[0] to get query
+	dir := FilePondPath + load[0] + "/"
+
+	files, err := ioutil.ReadDir(dir)
+	if err != nil {
+		u.Respond(w, u.Message(false, "Cannot file the specific directory, fuck yourself."))
+	}
+
+	filename := files[0].Name()
+
+	file, err := ioutil.ReadFile(dir + filename)
+	if err != nil {
+		u.Respond(w, u.Message(false, "Cannot file the specific file."))
+	}
+
+	u.RespondFile(w, r, file, filename)
+}
+
 type ConfirmMessage struct {
 	Files []string `json:"files"`
 }
